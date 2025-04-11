@@ -10,6 +10,7 @@ function Layout({ children }) {
         display: 'flex',
         flexDirection: 'column',
         minHeight: '100vh',
+        minWidth: '98.8vw',
       }}
     >
       <Navbar />

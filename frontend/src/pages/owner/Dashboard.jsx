@@ -13,13 +13,14 @@ import {
   ListItem,
   ListItemText,
   ListItemSecondaryAction,
-  IconButton,
+  Link,
 } from '@mui/material';
 import {
   Add as AddIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
   Visibility as VisibilityIcon,
+  Home as HomeIcon,
 } from '@mui/icons-material';
 
 function OwnerDashboard() {
@@ -40,6 +41,22 @@ function OwnerDashboard() {
       units: 36,
       occupancyRate: '88%',
       monthlyRevenue: '$62,000',
+    },
+    {
+      id: 3,
+      name: 'KLH Hostel',
+      address: 'Aziz Nagar X Roads, Moinabad road, Hyderabad, Telangana 500075',
+      units: 50,
+      occupancyRate: '80%',
+      monthlyRevenue: '$25,000',
+    },
+    {
+      id: 4,
+      name: 'Orange County Apartments',
+      address: 'mehdipatnam, Hyderabad, Telangana 500028',
+      units: 30,
+      occupancyRate: '100%',
+      monthlyRevenue: '$35,000',
     },
   ];
 
@@ -83,15 +100,49 @@ function OwnerDashboard() {
         {/* Properties Overview */}
         <Grid item xs={12}>
           <Paper sx={{ p: 2 }}>
-            <Typography variant="h6" gutterBottom>
-              Properties Overview
-            </Typography>
+          <Box sx = {{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            gap: 2,
+          }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <HomeIcon color="primary" />
+              <Typography variant="h6" gutterBottom>
+                Properties Overview
+              </Typography>
+            </Box>
+            <Button
+              size="small"
+              startIcon={<VisibilityIcon />}
+              onClick={() => {
+              // TODO: Implement view details functionality
+              }}
+            >
+              List Properties
+            </Button>
+          </Box>
             <Grid container spacing={3}>
               {properties.map((property) => (
                 <Grid item xs={12} md={6} key={property.id}>
                   <Card>
                     <CardContent>
-                      <Typography variant="h6">{property.name}</Typography>
+                      <Link variant="h6" component="button" 
+                       sx={{textDecoration: 'none',
+                        color: 'text.primary',
+                        border: 'none',
+                        background: 'none',
+                        font: 'inherit',
+                        padding: 0,
+                        '&:hover': {
+                          color: 'primary.main',
+                          transition: 'color 0.3s ease-in-out',
+                        },
+                       }} 
+                      
+                      >
+                        {property.name}
+                      </Link>
                       <Typography color="text.secondary" gutterBottom>
                         {property.address}
                       </Typography>

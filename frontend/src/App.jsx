@@ -19,14 +19,14 @@ function App() {
     <Provider store={store}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <Router>
+        <Router basename="/">
           <Layout>
             <Routes>
-              <Route path="/PGatEase" element={<Home />} />
-              <Route path="/PGatEase/login" element={<Login />} />
-              <Route path="/PGatEase/register" element={<Register />} />
-              <Route path="/PGatEase/owner/dashboard" element={<OwnerDashboard />} />
-              <Route path="/PGatEase/resident/dashboard" element={<ResidentDashboard />} />
+              <Route path="/" element={<Home />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/owner/dashboard" element={<OwnerDashboard />} />
+              <Route path="/resident/dashboard" element={<ResidentDashboard />} />
             </Routes>
           </Layout>
         </Router>

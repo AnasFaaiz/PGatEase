@@ -9,7 +9,7 @@ const __dirname = dirname(__filename)
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
-  base: '/',
+  base: '/PGatEase',
   build: {
     outDir: 'dist',
     assetsDir: 'assets',

@@ -23,10 +23,10 @@ function App() {
           <Layout>
             <Routes>
               <Route path="/PGatEase" element={<Home />} />
-              <Route path="/PGatEase/login" element={<Login />} />
-              <Route path="/PGatEase/register" element={<Register />} />
-              <Route path="/PGatEase/owner/dashboard" element={<OwnerDashboard />} />
-              <Route path="/PGatEase/resident/dashboard" element={<ResidentDashboard />} />
+              <Route path="/PGatEase/#/login" element={<Login />} />
+              <Route path="/PGatEase/#/register" element={<Register />} />
+              <Route path="/PGatEase/#/owner/dashboard" element={<OwnerDashboard />} />
+              <Route path="/PGatEase/#/resident/dashboard" element={<ResidentDashboard />} />
             </Routes>
           </Layout>
         </Router>

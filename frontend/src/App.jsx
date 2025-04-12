@@ -13,6 +13,7 @@ import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
 import OwnerDashboard from './pages/owner/Dashboard';
 import ResidentDashboard from './pages/resident/Dashboard';
+import PropertyDetails from './pages/owner/PropertyDetails';
 
 function App() {
   return (
@@ -27,6 +28,7 @@ function App() {
               <Route path="/register" element={<Register />} />
               <Route path="/owner/dashboard" element={<OwnerDashboard />} />
               <Route path="/resident/dashboard" element={<ResidentDashboard />} />
+              <Route path="/property/:id" element={<PropertyDetails />} />
             </Routes>
           </Layout>
         </Router>

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Box,
   Container,
@@ -13,18 +13,27 @@ import {
   ListItem,
   ListItemText,
   ListItemSecondaryAction,
-  Link,
 } from '@mui/material';
 import {
   Add as AddIcon,
   Edit as EditIcon,
-  Delete as DeleteIcon,
   Visibility as VisibilityIcon,
   Home as HomeIcon,
 } from '@mui/icons-material';
+import ListProperties from './ListProperties';
+import { useNavigate } from 'react-router-dom';
 
 function OwnerDashboard() {
-  // Mock data - replace with actual data from API
+  const navigate = useNavigate();
+  const [openListProperties, setOpenListProperties] = useState(false);
+
+  const handlePropertyList = () => {
+    setOpenListProperties(true);
+  }
+  const handleClosePropertyList = () => {
+    setOpenListProperties(false);
+  };
+
   const properties = [
     {
       id: 1,
@@ -108,16 +117,14 @@ function OwnerDashboard() {
           }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               <HomeIcon color="primary" />
-              <Typography variant="h6" gutterBottom>
+              <Typography variant="h6">
                 Properties Overview
               </Typography>
             </Box>
             <Button
               size="small"
               startIcon={<VisibilityIcon />}
-              onClick={() => {
-              // TODO: Implement view details functionality
-              }}
+              onClick={handlePropertyList}
             >
               List Properties
             </Button>
@@ -127,22 +134,25 @@ function OwnerDashboard() {
                 <Grid item xs={12} md={6} key={property.id}>
                   <Card>
                     <CardContent>
-                      <Link variant="h6" component="button" 
-                       sx={{textDecoration: 'none',
+                    <Button
+                      variant="text"
+                      sx={{
+                        textAlign: 'left',
+                        textTransform: 'none',
                         color: 'text.primary',
-                        border: 'none',
-                        background: 'none',
-                        font: 'inherit',
                         padding: 0,
                         '&:hover': {
                           color: 'primary.main',
+                          backgroundColor: 'transparent',
                           transition: 'color 0.3s ease-in-out',
                         },
-                       }} 
-                      
-                      >
-                        {property.name}
-                      </Link>
+                      }}
+                      onClick={() =>
+                        navigate(`/property/${property.id}`)}
+                    >
+                      {property.name}
+                    </Button>
+
                       <Typography color="text.secondary" gutterBottom>
                         {property.address}
                       </Typography>
@@ -214,6 +224,12 @@ function OwnerDashboard() {
           </Paper>
         </Grid>
       </Grid>
+
+      <ListProperties 
+        open={openListProperties} 
+        onClose={handleClosePropertyList}
+        properties={properties}
+      />
     </Container>
   );
 }

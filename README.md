@@ -2,6 +2,9 @@
 
 PGatEase is a comprehensive web application designed to streamline the management of Paying Guest (PG) accommodations. The platform serves both PG owners and residents, providing features for efficient management and enhanced living experience.
 
+## Link:
+https://anasfaaiz.github.io/PGatEase/
+
 ## Features
 
 ### For PG Owners

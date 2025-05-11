@@ -1,3 +1,4 @@
+"use client"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -13,8 +14,12 @@ import {
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { MoreHorizontal, Search, UserPlus } from "lucide-react"
+import { useRouter } from "next/navigation"
+import { useState } from "react";
 
 export default function ResidentsPage() {
+  const router = useRouter()
+
   // Sample data for residents
   const residents = [
     {
@@ -85,6 +90,11 @@ export default function ResidentsPage() {
     },
   ]
 
+  const handleAddResident = () => {
+    // Logic to add a new resident
+    router.push("/owner/residents/add-residents")
+  };
+
   return (
     <div className="p-6">
       <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -93,7 +103,7 @@ export default function ResidentsPage() {
           <p className="text-muted-foreground">Manage residents at Sunshine PG</p>
         </div>
         <div className="flex gap-2">
-          <Button>
+          <Button onClick={handleAddResident}>
             <UserPlus className="mr-2 h-4 w-4" /> Add Resident
           </Button>
         </div>

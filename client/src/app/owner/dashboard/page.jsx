@@ -1,6 +1,7 @@
 "use client"
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { useState, useEffect, useMemo, useCallback } from "react"
 import {
   BarChart,
   Bar,
@@ -13,38 +14,166 @@ import {
   Pie,
   Cell,
   Legend,
-} from "recharts" // Changed from local import to recharts package
+} from "recharts"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { AlertCircle, ArrowUpRight, Building2, CreditCard, Users } from "lucide-react"
+import { useRouter } from "next/navigation"
 
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"]
 
+// Historical data for trend calculations
+const HISTORICAL_DATA = {
+  lastMonth: {
+    residents: 95,
+    occupancyRate: 82,
+    revenue: 485000,
+    complaints: 15
+  }
+}
+
+const INITIAL_PROPERTIES = [
+  { 
+    name: "Sunshine PG",
+    address: "123 Main Street, Bangalore",
+    occupied: 42,
+    vacant: 8,
+    totalCapacity: 50,
+    facilities: ["WiFi", "AC", "Laundry", "Gym"],
+    rules: "No smoking, No loud music after 10 PM",
+    createdAt: "2024-01-01T00:00:00.000Z",
+    monthlyRent: 8000
+  },
+  {
+    name: "Green Valley PG",
+    address: "456 Park Road, Bangalore",
+    occupied: 28,
+    vacant: 12,
+    totalCapacity: 40,
+    facilities: ["WiFi", "Power Backup", "Security"],
+    rules: "No pets, Visitors allowed till 8 PM",
+    createdAt: "2024-02-15T00:00:00.000Z",
+    monthlyRent: 7500
+  },
+  {
+    name: "City Heights PG",
+    address: "789 Lake View, Bangalore",
+    occupied: 35,
+    vacant: 5,
+    totalCapacity: 40,
+    facilities: ["WiFi", "AC", "Food", "Garden"],
+    rules: "No outside food, Daily curfew at 10 PM",
+    createdAt: "2024-03-01T00:00:00.000Z",
+    monthlyRent: 8500
+  }
+]
+
+const ALERTS_DATA = [
+  {
+    title: "Water Leakage",
+    severity: "High",
+    location: "Room 302, Sunshine PG",
+    time: "2 hours ago"
+  },
+  {
+    title: "Electrical Issue",
+    severity: "Medium",
+    location: "Room 105, Green Valley PG",
+    time: "5 hours ago"
+  },
+  {
+    title: "AC Malfunction",
+    severity: "Medium",
+    location: "Room 201, City Heights PG",
+    time: "Yesterday"
+  }
+]
+
 export default function OwnerDashboard() {
-  // Sample data for charts - In a real app, this would come from an API
-  const occupancyData = [
-    { name: "Sunshine PG", occupied: 42, vacant: 8 },
-    { name: "Green Valley PG", occupied: 28, vacant: 12 },
-    { name: "City Heights PG", occupied: 35, vacant: 5 },
-  ]
+  const router = useRouter()
+  const [properties, setProperties] = useState([])
+  const [isLoaded, setIsLoaded] = useState(false)
 
-  const paymentData = [
-    { name: "Jan", amount: 120000 },
-    { name: "Feb", amount: 150000 },
-    { name: "Mar", amount: 145000 },
-    { name: "Apr", amount: 160000 },
-    { name: "May", amount: 175000 },
-    { name: "Jun", amount: 190000 },
-  ]
+  // Load properties from localStorage on mount
+  useEffect(() => {
+    const saved = localStorage.getItem("properties")
+    const initialProperties = saved ? JSON.parse(saved) : INITIAL_PROPERTIES
+    setProperties(initialProperties)
+    setIsLoaded(true)
+  }, [])
 
-  const complaintData = [
-    { name: "Maintenance", value: 45 },
-    { name: "Food", value: 30 },
-    { name: "Cleanliness", value: 15 },
-    { name: "Others", value: 10 },
-  ]
+  // Save to localStorage when properties change
+  useEffect(() => {
+    if (isLoaded) {
+      localStorage.setItem("properties", JSON.stringify(properties))
+    }
+  }, [properties, isLoaded])
 
-  const renderStatCard = (title, value, icon, subtext) => (
+  // Calculate statistics
+  const stats = useMemo(() => {
+    if (!properties.length) return {
+      residents: 0,
+      totalRooms: 0,
+      revenue: 0,
+      occupancyRate: 0,
+      complaints: 0
+    }
+    
+    const calculated = properties.reduce((acc, property) => {
+      acc.residents += property.occupied
+      acc.totalRooms += (property.occupied + property.vacant)
+      acc.revenue += property.occupied * (property.monthlyRent || 8000)
+      return acc
+    }, { residents: 0, totalRooms: 0, revenue: 0 })
+
+    calculated.occupancyRate = (calculated.residents / calculated.totalRooms * 100).toFixed(1)
+    calculated.complaints = Math.floor(Math.random() * 20)
+
+    return calculated
+  }, [properties])
+
+  // Calculate trends
+  const trends = useMemo(() => {
+    const residentChange = ((stats.residents - HISTORICAL_DATA.lastMonth.residents) / 
+      HISTORICAL_DATA.lastMonth.residents * 100).toFixed(1)
+    
+    const occupancyChange = (parseFloat(stats.occupancyRate) - HISTORICAL_DATA.lastMonth.occupancyRate).toFixed(1)
+    
+    const revenueChange = ((stats.revenue - HISTORICAL_DATA.lastMonth.revenue) / 
+      HISTORICAL_DATA.lastMonth.revenue * 100).toFixed(1)
+
+    const complaintChange = ((stats.complaints - HISTORICAL_DATA.lastMonth.complaints) / 
+      HISTORICAL_DATA.lastMonth.complaints * 100).toFixed(1)
+
+    return {
+      residents: { value: stats.residents, change: residentChange, increasing: residentChange > 0 },
+      occupancy: { value: stats.occupancyRate, change: occupancyChange, increasing: occupancyChange > 0 },
+      revenue: { value: stats.revenue, change: revenueChange, increasing: revenueChange > 0 },
+      complaints: { value: stats.complaints, change: complaintChange, increasing: complaintChange < 0 }
+    }
+  }, [stats])
+
+  // Generate payment data
+  const paymentData = useMemo(() => {
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun"]
+    const baseRevenue = stats.revenue
+    return months.map((month, index) => ({
+      name: month,
+      amount: Math.floor(baseRevenue * (0.95 + (index * 0.01))),
+      occupied: stats.residents - Math.floor(Math.random() * 10)
+    }))
+  }, [stats.revenue, stats.residents])
+
+  // Helper functions
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
+      maximumFractionDigits: 0
+    }).format(amount)
+  }
+
+  const renderStatCard = (title, value, icon, trend) => (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between pb-2">
         <CardTitle className="text-sm font-medium">{title}</CardTitle>
@@ -52,14 +181,23 @@ export default function OwnerDashboard() {
       </CardHeader>
       <CardContent>
         <div className="text-2xl font-bold">{value}</div>
-        <p className="text-xs text-muted-foreground">{subtext}</p>
+        <div className="flex items-center text-xs text-muted-foreground">
+          {trend.increasing ? '+' : ''}{trend.change}% from last month
+          <ArrowUpRight className={`ml-1 h-3 w-3 ${
+            trend.increasing === (title === "Active Complaints" ? false : true) 
+              ? 'text-green-500' 
+              : 'text-red-500 transform rotate-90'
+          }`} />
+        </div>
       </CardContent>
     </Card>
   )
 
   const renderAlert = (title, severity, location, time) => (
     <div className="flex items-start gap-4 rounded-lg border p-3">
-      <AlertCircle className={`mt-0.5 h-5 w-5 ${severity === 'High' ? 'text-red-500' : 'text-amber-500'}`} />
+      <AlertCircle className={`mt-0.5 h-5 w-5 ${
+        severity === 'High' ? 'text-red-500' : 'text-amber-500'
+      }`} />
       <div>
         <div className="flex items-center gap-2">
           <h4 className="font-semibold">{title}</h4>
@@ -71,6 +209,17 @@ export default function OwnerDashboard() {
     </div>
   )
 
+  if (!isLoaded) {
+    return (
+      <div className="p-6">
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold">Owner Dashboard</h1>
+          <p className="text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="p-6">
       <div className="mb-6 flex items-center justify-between">
@@ -78,7 +227,7 @@ export default function OwnerDashboard() {
           <h1 className="text-2xl font-bold">Owner Dashboard</h1>
           <p className="text-muted-foreground">Overview of your PG properties</p>
         </div>
-        <Button>
+        <Button onClick={() => router.push("/owner/dashboard/add-property")}>
           <Building2 className="mr-2 h-4 w-4" /> Add New Property
         </Button>
       </div>
@@ -86,47 +235,51 @@ export default function OwnerDashboard() {
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         {renderStatCard(
           "Total Residents",
-          "105",
+          trends.residents.value.toString(),
           <Users className="h-4 w-4 text-muted-foreground" />,
-          <>+12% from last month <ArrowUpRight className="ml-1 inline h-3 w-3" /></>
+          trends.residents
         )}
         {renderStatCard(
           "Occupancy Rate",
-          "87.5%",
+          `${trends.occupancy.value}%`,
           <Building2 className="h-4 w-4 text-muted-foreground" />,
-          <>+5% from last month <ArrowUpRight className="ml-1 inline h-3 w-3" /></>
+          trends.occupancy
         )}
         {renderStatCard(
           "Monthly Revenue",
-          "₹5,25,000",
+          formatCurrency(trends.revenue.value),
           <CreditCard className="h-4 w-4 text-muted-foreground" />,
-          <>+8% from last month <ArrowUpRight className="ml-1 inline h-3 w-3" /></>
+          trends.revenue
         )}
         {renderStatCard(
           "Active Complaints",
-          "12",
+          trends.complaints.value.toString(),
           <AlertCircle className="h-4 w-4 text-muted-foreground" />,
-          "3 high priority"
+          trends.complaints
         )}
       </div>
 
-      {/* Charts section */}
       <div className="mt-6 grid gap-6 lg:grid-cols-2">
         <Card className="col-span-1">
           <CardHeader>
             <CardTitle>Occupancy Overview</CardTitle>
-            <CardDescription>Current occupancy across all properties</CardDescription>
+            <CardDescription>
+              Current occupancy across all properties ({trends.occupancy.value}% overall)
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={occupancyData}>
+              <BarChart data={properties}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="name" />
                 <YAxis />
-                <Tooltip />
+                <Tooltip formatter={(value, name) => [
+                  `${value} rooms`,
+                  name === "occupied" ? "Occupied" : "Vacant"
+                ]} />
                 <Legend />
-                <Bar dataKey="occupied" fill="#0088FE" name="Occupied" />
-                <Bar dataKey="vacant" fill="#FF8042" name="Vacant" />
+                <Bar dataKey="occupied" fill="#0088FE" name="Occupied" stackId="stack" />
+                <Bar dataKey="vacant" fill="#FF8042" name="Vacant" stackId="stack" />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
@@ -143,8 +296,8 @@ export default function OwnerDashboard() {
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="name" />
                 <YAxis />
-                <Tooltip />
-                <Bar dataKey="amount" fill="#00C49F" name="Revenue (₹)" />
+                <Tooltip formatter={(value) => formatCurrency(value)} />
+                <Bar dataKey="amount" fill="#00C49F" name="Revenue" />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
@@ -162,7 +315,12 @@ export default function OwnerDashboard() {
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
-                    data={complaintData}
+                    data={[
+                      { name: "Maintenance", value: 45, count: 15 },
+                      { name: "Food Quality", value: 30, count: 10 },
+                      { name: "Cleanliness", value: 15, count: 5 },
+                      { name: "Others", value: 10, count: 3 }
+                    ]}
                     cx="50%"
                     cy="50%"
                     labelLine={false}
@@ -171,7 +329,7 @@ export default function OwnerDashboard() {
                     dataKey="value"
                     label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
                   >
-                    {complaintData.map((entry, index) => (
+                    {({ data }) => data.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Pie>
@@ -190,24 +348,14 @@ export default function OwnerDashboard() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {renderAlert(
-                "Water Leakage",
-                "High",
-                "Room 302, Sunshine PG",
-                "2 hours ago"
-              )}
-              {renderAlert(
-                "Electrical Issue",
-                "Medium",
-                "Room 105, Green Valley PG",
-                "5 hours ago"
-              )}
-              {renderAlert(
-                "AC Malfunction",
-                "Medium",
-                "Room 201, City Heights PG",
-                "Yesterday"
-              )}
+              {ALERTS_DATA.map((alert, index) => (
+                renderAlert(
+                  alert.title,
+                  alert.severity,
+                  alert.location,
+                  alert.time
+                )
+              ))}
             </div>
           </CardContent>
         </Card>

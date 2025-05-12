@@ -2,6 +2,9 @@
 
 PGatEase is a comprehensive web application designed to streamline the management of Paying Guest (PG) accommodations. The platform serves both PG owners and residents, providing features for efficient management and enhanced living experience.
 
+## Link:
+https://anasfaaiz.github.io/PGatEase/
+
 ## Features
 
 ### For PG Owners
@@ -19,11 +22,11 @@ PGatEase is a comprehensive web application designed to streamline the managemen
 
 ## Tech Stack
 
-- Frontend: React.js with TypeScript
+- Frontend: Next.js with Javascriptn Tailwind css
+- Backend: nodejs
+- Database: mysql
 - UI Framework: Material-UI (MUI)
-- State Management: Redux Toolkit
-- Form Handling: Formik with Yup validation
-- Routing: React Router
+- Routing: app router
 - HTTP Client: Axios
 
 ## Getting Started

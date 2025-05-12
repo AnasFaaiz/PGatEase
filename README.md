@@ -22,11 +22,11 @@ https://anasfaaiz.github.io/PGatEase/
 
 ## Tech Stack
 
-- Frontend: React.js with TypeScript
+- Frontend: Next.js with Javascriptn Tailwind css
+- Backend: nodejs
+- Database: mysql
 - UI Framework: Material-UI (MUI)
-- State Management: Redux Toolkit
-- Form Handling: Formik with Yup validation
-- Routing: React Router
+- Routing: app router
 - HTTP Client: Axios
 
 ## Getting Started

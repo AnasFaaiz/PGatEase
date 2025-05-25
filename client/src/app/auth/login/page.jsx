@@ -106,6 +106,21 @@ export default function LoginPage() {
           </Tabs>
         </CardContent>
         <CardFooter className="flex flex-col space-y-4">
+
+          <div className="text-center text-sm">
+            Don&apos;t have an account?{" "}
+            {activeTab === "owner" ? (
+              <Link href="/auth/registration/owner" className="text-blue-600 hover:underline">
+                Sign up as PG Owner
+              </Link>
+            ) : (
+              <Link href="/auth/registration/resident" className="text-blue-600 hover:underline">
+                Sign up as Resident
+              </Link>
+            )}
+          </div>
+        </CardFooter>
+
         <div className="text-center text-sm">
           Don&apos;t have an account?{" "}
           <Link 
@@ -120,6 +135,7 @@ export default function LoginPage() {
           </Link>
         </div>
       </CardFooter>
+
       </Card>
     </div>
   )

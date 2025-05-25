@@ -28,6 +28,10 @@ export default function LoginPage() {
     } else {
       router.push("/resident/dashboard")
     }
+  };
+
+  const handleSignUp = () => {
+    router.push("/auth/register")
   }
 
   return (
@@ -102,6 +106,7 @@ export default function LoginPage() {
           </Tabs>
         </CardContent>
         <CardFooter className="flex flex-col space-y-4">
+
           <div className="text-center text-sm">
             Don&apos;t have an account?{" "}
             {activeTab === "owner" ? (
@@ -115,6 +120,22 @@ export default function LoginPage() {
             )}
           </div>
         </CardFooter>
+
+        <div className="text-center text-sm">
+          Don&apos;t have an account?{" "}
+          <Link 
+            href="/auth/register" 
+            className="text-blue-600 hover:underline"
+            onClick={(e) => {
+              e.preventDefault()
+              handleSignUp()
+            }}
+          >
+            Sign up
+          </Link>
+        </div>
+      </CardFooter>
+
       </Card>
     </div>
   )
